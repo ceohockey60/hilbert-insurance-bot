@@ -1,10 +1,14 @@
 # README #
 
-This is the respository to practice version control. As a starting point, I'm using CS231n's homework diretory as I work through the homework. 
+This is the respository to for the OCR project for Kevin/(my) startup... 
 
 history: 
 
-2016/12/28 Changed the protocol to ssh just for fun
+2016/12/28 Changed the protocol to ssh just for fun and took 1 hour to realize the url actually matters... a lot. 
+### So apparently, for the url, it has to be:
+###             ssh://git@bitbucket.org/nairb2016/cs231n.git
+###             ssh://git@bitbucket.org:nairb2016/cs231n.git DOES NOT WORK
+
 
 ### What is this repository for? ###
 
