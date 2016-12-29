@@ -1,6 +1,6 @@
 # README #
 
-This is the respository to for the OCR project for Kevin/(my) startup... 
+This is the respository to for the OCR project for <insert name> startup... 
 
 history: 
 
