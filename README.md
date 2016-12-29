@@ -10,6 +10,8 @@ history:
 * ssh://git@bitbucket.org:nairb2016/cs231n.git DOES NOT WORK
 
 
+# Please read Install_tesseract_SOP to understand how to run the code
+
 ### What is this repository for? ###
 
 * Quick summary

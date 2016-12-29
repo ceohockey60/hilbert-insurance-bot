@@ -1,0 +1,21 @@
+To run Tesseract: (on mac) 
+
+1. Install tesseract-ocr and related tools 
+
+  1) install homebrew and macport
+      http://brew.sh/
+      https://www.macports.org/install.php
+  2) download X11 if you are running MaxOS 10.6 or above
+      https://www.xquartz.org/
+  3) install PyOCR, Tesseract, ghostscript and other tools
+     sudo pip install pyocr 
+     brew install tesseract 
+     brew install imagemagick
+     brew install pillow
+     brew install wand 
+     brew install ghostscript
+
+  4) run the python code (can use iPython notebook to demo) 
+    http://cs231n.github.io/ipython-tutorial/
+  
+
