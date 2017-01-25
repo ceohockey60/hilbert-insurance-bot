@@ -1,0 +1,104 @@
+@charset "UTF-8";
+@import url("//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css");
+@import url(//fonts.googleapis.com/css?family=Open+Sans:400,700,800,300);
+
+/*.hero .intro {*/
+  /*padding: 2rem;*/
+  /*position: relative;*/
+  /*top: 50%;*/
+  /*transform: translateY(-50%); }*/
+
+.home-container{
+  height: 100vh;
+  width: 100vw;
+  padding: 0vh 30vw 15vh 30vw;
+  margin: auto;
+  /*display: -webkit-box;*/
+  /*display: -moz-box;*/
+  /*display: -ms-flexbox;*/
+  /*display: -webkit-flex;*/
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.hero h1 {
+  color: white;
+  /*line-height: 1.5em;*/
+  font-weight: 300;
+  text-align: center; }
+
+.hero h3 {
+  color: white;
+  /*line-height: 1.75em;*/
+  font-weight: 200;
+  text-align: center;  }
+
+.hero h5 {
+  color: white;
+  /*line-height: 1.75em;*/
+  font-weight: 200;
+  text-align: center;  }
+
+#btn-home{
+  background-color: lightskyblue;
+}
+
+/*.hero .tech-img {*/
+/*background: url("./img/doctor_patient.jpg") no-repeat center center;*/
+/*background-size: cover;*/
+/*height: 9rem;*/
+/*width: 9rem;*/
+/*border-radius: 50%;*/
+/*display: block;*/
+/*margin: 0 auto; }*/
+/*.dev-container{*/
+  /*width: 100vw;*/
+  /*height: 100vh;*/
+  /*margin: auto;*/
+  /*display: flex;*/
+  /*align-items: center;*/
+  /*justify-content: center;*/
+/*}*/
+
+.md-toolbar-tools{
+  background-color: lightskyblue;
+}
+
+#btn1{
+  background-color: lightskyblue;
+}
+
+#login-fail{
+  color: red;
+}
+
+#login-success{
+  color: green;
+}
+
+#DevLoginContent {
+  width: 425px;
+  height: 425px;
+  background-color: white;
+  border-radius: 4px;
+}
+
+@media only screen and (max-width: 600px) {
+
+  #DevLoginContent {
+    padding: 5vh 30vw 15vh 30vw;
+    height: 100%;
+  }
+}
+
+@media only screen and (max-width: 425px) {
+  .hero h1 {
+    text-align: center;}
+  /*font-size: 2.5rem; }*/
+  .hero h3 {
+    text-align: center;}
+  /*font-size: 1.5rem;}*/
+  .hero h5 {
+    text-align: center; } }

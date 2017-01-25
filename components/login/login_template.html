@@ -1,0 +1,34 @@
+<!--Login HTML Template-->
+
+<div class="form-container" flex layout="column">
+  <md-content id="LoginContent" class="md-whiteframe-10dp" flex-sm>
+    <md-toolbar flex id="formHeading">
+      <div class="md-toolbar-tools"><span flex=""></span> <span class="md-headline" align="center">
+          Login Form</span> <span flex=""></span> </div>
+    </md-toolbar>
+      <div layout-padding="">
+        <div><p id="login-fail" ng-if="main.login.failure_msg">{{main.login.failure_msg}}</p>
+        </div>
+        <form name="loginForm" method="POST" action="">
+          <div layout="row" layout-sm="column">
+            <md-input-container flex-gt-sm="">
+              <label>Your Email</label>
+              <input required type="email" name="email" ng-model="main.login.email" ng-pattern="/^[_a-z0-9-+]+(\.[_a-z0-9-+]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/" required/>
+            </md-input-container>
+          </div>
+
+          <div layout="row" layout-sm="column">
+            <md-input-container flex-gt-sm="">
+              <label>Password</label>
+              <input name="password" ng-model="main.login.password" type="password" minlength="5" maxlength="100" required>
+            </md-input-container>
+          </div>
+
+          <div layout="row" layout-sm="column">
+            <md-button class="md-raised md-primary" id="btn1" style="width:100%; margin: 5px 5px;" ng-click="main.login.loggingIn()" ng-disabled="loginForm.$invalid" name="submit">Login</md-button>
+            <md-button class="md-raised md-primary" id="btn1" style="width:100%; margin: 5px 5px;" ng-click="main.login.cancel()" name="cancel">Cancel</md-button>
+          </div>
+        </form>
+      </div>
+  </md-content>
+</div>

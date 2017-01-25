@@ -1,0 +1,98 @@
+@charset "UTF-8";
+@import url("//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css");
+@import url(//fonts.googleapis.com/css?family=Open+Sans:400,700,800,300);
+
+/* Responsive Hero Image Homepage CSS */
+.hero {
+  background: url("/img/doctor_patient-min.jpg") no-repeat center center;
+  background-size: cover;
+  height: 93.5vh; }
+
+/*.hero:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: linear-gradient(to bottom right, #002f4b, #dc4225);
+  opacity: .8; }
+*/
+.hero .intro {
+  padding: 2rem;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%); }
+
+/*.hero h1 {*/
+  /*color: white;*/
+  /*font-size: 1.5rem;*/
+  /*line-height: 1.5em;*/
+  /*letter-spacing: -0.025em;*/
+  /*font-weight: 300;*/
+  /*text-align: center; }*/
+
+/*.hero h3 {*/
+  /*color: white;*/
+  /*line-height: 1.75em;*/
+  /*font-weight: 200;*/
+  /*text-align: center;*/
+  /*margin-bottom: 2rem; }*/
+
+/*.hero h5 {*/
+  /*color: white;*/
+  /*line-height: 1.75em;*/
+  /*font-weight: 200;*/
+  /*text-align: center;*/
+  /*margin-bottom: 2rem; }*/
+
+/*.hero .tech-img {*/
+  /*background: url("./img/doctor_patient.jpg") no-repeat center center;*/
+  /*background-size: cover;*/
+  /*height: 9rem;*/
+  /*width: 9rem;*/
+  /*border-radius: 50%;*/
+  /*display: block;*/
+  /*margin: 0 auto; }*/
+
+@media only screen and (min-width: 40.063em) {
+  /*.hero .tech-img {*/
+    /*height: 18rem;*/
+    /*width: 18rem; }*/
+  .hero h1 {
+    padding-top: 10rem;
+    text-align: center;}
+    /*font-size: 2.5rem; }*/
+  .hero h3 {
+    text-align: center;}
+    /*font-size: 1.5rem;}*/
+  .hero h5 {
+    text-align: center; } }
+
+/* Responsive Footer CSS */
+footer {
+  background: #2d2b2a;
+  color: #fff;
+  padding: 2rem 0;
+  text-align: center;
+  font-size: .8rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+footer ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+footer ul li {
+  display: inline-block;
+}
+footer ul li a {
+  display: block;
+  padding: .4rem .7rem;
+  font-size: .9rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.7);
+}
+footer ul li a:hover {
+  color: white;
+}

@@ -1,0 +1,34 @@
+<!--HTML template for Homepage-->
+<div class="home-container" flex layout="column">
+  <h1 class="md-display-3">KAI Insurance</h1>
+  <md-content id="DevLoginContent" class="md-whiteframe-10dp" flex-sm>
+    <md-toolbar flex>
+      <div class="md-toolbar-tools"><span flex=""></span> <span class="md-headline" align="center">
+          Private Access to KAI</span> <span flex=""></span> </div>
+    </md-toolbar>
+    <div layout-padding="">
+      <div>
+        <p id="login-fail" ng-show="main.dev_permission_denied">{{main.dev_permission_denied}}</p>
+        <p id="login-success" ng-show="main.dev_permission_granted">{{main.dev_permission_granted}}</p>
+      </div>
+      <form name="devLoginForm">
+        <div layout="row" layout-sm="column">
+          <md-input-container flex-gt-sm="">
+            <label>Enter Your Access Code</label>
+            <input name="accessCode" ng-model="main.dev_cred" type="password" minlength="1" maxlength="100" required>
+          </md-input-container>
+        </div>
+        <div layout="row" layout-sm="column">
+          <md-button class="md-raised md-primary" id="btn1" style="width:100%; margin: 5px 5px;" ng-click="main.toDevLogin()" ng-disabled="loginForm.$invalid" name="access">Access</md-button>
+        </div>
+      </form>
+    </div>
+  </md-content>
+
+  <!--<h3 class="md-title">Answers to all your health insurance questions</h3>-->
+  <!--<h5 class="md-subhead">(Currently in private beta...)</h5>-->
+  <!--<md-button class="md-raised md-primary" id="btn-home" style="width:100%; margin: 5px 5px;" ng-click="main.toRegister()" >Sign Up As Tester</md-button>-->
+  <!--<md-button class="md-raised md-primary" id="btn-home" style="width:100%; margin: 5px 5px;" ng-click="main.toLogIn()">Log In</md-button>-->
+</div>
+
+

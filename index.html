@@ -1,0 +1,66 @@
+<!doctype html>
+<html ng-app="kaiBotApp" ng-controller="MainController">
+    <head>
+        <title>{{main.title}}</title>
+
+        <!-- Angular Material style sheet -->
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,400italic">
+
+        <!-- Angular Material requires Angular.js Libraries -->
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-animate.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-route.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-resource.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-aria.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular-messages.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0/angular-material.min.js"></script>
+
+        <!--WebChat Botframework Component-->
+        <script src="components/dev/webchat_master/webpacked/botchat.js"></script>
+        <link rel="stylesheet" type="text/css" href="components/dev/webchat_master/static/botchat.css"/>
+
+        <!--Web App Components-->
+        <script src="MainController.js"></script>
+        <link rel="stylesheet" type="text/css" href="main.css" />
+
+        <script src="components/home/HomeController.js"></script>
+        <link rel="stylesheet" type="text/css" href="components/home/home.css" />
+
+        <script src="components/login/LoginController.js"></script>
+        <link rel="stylesheet" type="text/css" href="components/login/login.css"/>
+
+        <script src="components/register/RegisterController.js"></script>
+        <link rel="stylesheet" type="text/css" href="components/register/register.css"/>
+
+        <script src="components/user-profile/UserProfileController.js"></script>
+        <link rel="stylesheet" type="text/css" href="components/user-profile/user-profile.css"/>
+
+        <script src="components/dev/DevController.js"></script>
+        <link rel="stylesheet" type="text/css" href="components/dev/dev.css"/>
+
+    </head>
+    <body>
+        <div class="hero">
+          <!--This link is used to test MongoDB connection.-->
+          <!--<ul>-->
+            <!--<li><a href="/test/info">/test/info</a> - Return information about the Test Schema</li>-->
+          <!--</ul>-->
+
+          <div ng-view></div>  <!--Where different HTML templates are rendered-->
+        </div>
+
+        <footer>
+          <div class="container">
+            <ul>
+              <li><a href="#">About Us</a></li>
+              <li><a href="#">Terms of Service</a></li>
+              <li><a href="#">Privacy Policy</a></li>
+              <!--<li><a href="#">Press</a></li>-->
+              <li><a href="#">Contact Us</a></li>
+            </ul>
+            <p>&copy; 2016 KaiBot Inc. All rights reserved.</p>
+          </div>
+        </footer>
+    </body>
+</html>
