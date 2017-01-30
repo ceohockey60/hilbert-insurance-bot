@@ -1,5 +1,3 @@
-// ### Test message for bitbucket
-
 //=========================================================
 // KAI Bot server.js is the node.js server that contains all the
 // features, logic, and functionalities that power the bot
@@ -433,11 +431,11 @@ bot.dialog('/home', [
 	    					//TODO: make second param string more user friendly, for SMS layout.
 	    					//ISSUE: if button is clicked many times, they dialog will be triggered as many times....
 	    					builder.CardAction.dialogAction(session, "Query", undefined, "About My Plan"),
-	    					builder.CardAction.dialogAction(session, "Insurance 101", undefined, "Insurance 101"),
-	    					builder.CardAction.dialogAction(session, "Appeal", undefined, "Appeal Process"),
-	    					builder.CardAction.dialogAction(session, "Bill Analyzer", undefined, "Analyze My Bill"),
+	    					// builder.CardAction.dialogAction(session, "Insurance 101", undefined, "Insurance 101"),
+	    					// builder.CardAction.dialogAction(session, "Appeal", undefined, "Appeal Process"),
+	    					builder.CardAction.dialogAction(session, "EOB Analyzer", undefined, "Explanation of Benefits Analysis"),
 	    					//builder.CardAction.dialogAction(session, "Estimate Cost", undefined, "Estimate Cost"),
-	    					builder.CardAction.dialogAction(session, "Tips", undefined, "Tips & Advice"),
+	    					// builder.CardAction.dialogAction(session, "Tips", undefined, "Tips & Advice"),
 	    					builder.CardAction.dialogAction(session, "Exit", undefined, "End Conversation")
 	    					])
 	    				]);
@@ -462,8 +460,9 @@ bot.dialog('/query', [
 						builder.CardAction.dialogAction(session, "Medical Coverage", undefined, "Medical Coverage"),
 						builder.CardAction.dialogAction(session, "Mental Health Coverage", undefined, "Mental Health Coverage"),
 						builder.CardAction.dialogAction(session, "Prescription Drug", undefined, "Prescription Drug"),
+						builder.CardAction.dialogAction(session, "Insurance 101", undefined, "Insurance 101"),
 						builder.CardAction.dialogAction(session, "My Plan Basics", undefined, "My Plan Basics"),
-						builder.CardAction.dialogAction(session, "Appeal", undefined, "Appeal Process"),
+						builder.CardAction.dialogAction(session, "HSA FSA", undefined, "HSA FSA Management"),
 						builder.CardAction.dialogAction(session, "Go Back", undefined, "Go Back")
 						])
 					]);
@@ -489,9 +488,8 @@ medical_coverage_intents.onBegin(function (session, args, next){
 		session.sendTyping();
 		session.send("What other question about your plan's medical coverage can I help you with?");
 	} else {
-		session.send("OK, I can help you out with figuring out medical coverage of your plan.");
 		session.sendTyping();
-		session.send("What's your question?");
+		session.send("OK, I can help you out. What's your question?");
 	}
 });
 
@@ -820,11 +818,22 @@ bot.dialog("/my_plan_basics", [
 	function(session, args, next){
 		session.sendTyping();
 		session.send("Coming soon...");
-		session.replaceDialog('/home', { reprompt: true, name: session.userData.profile.name });
+		session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name });
 		session.sendTyping();
 	}
 ]);
 bot.beginDialogAction('My Plan Basics', '/my_plan_basics');
+
+// TODO: HSA FSA management option
+bot.dialog('/hsa_fsa_query', [
+	function(session, args, next){
+		session.sendTyping();
+		session.send("HSA & FSA management features coming soon...");
+		session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name });
+		session.sendTyping();
+	}
+]);
+bot.beginDialogAction('HSA FSA', '/hsa_fsa_query');
 
 // TODO: Go Back Option
 bot.dialog("/go_back_home", [
@@ -934,12 +943,12 @@ bot.dialog('/insurance101', [
                     .title("Insurance 101")
                     .buttons([
                         builder.CardAction.dialogAction(session, "EOB", undefined, "Evidence of Benefits"),
-						            builder.CardAction.dialogAction(session, "My Plan Basics", undefined, "My Plan Basics"),
+						builder.CardAction.dialogAction(session, "My Plan Basics", undefined, "My Plan Basics"),
                         builder.CardAction.dialogAction(session, "Copay/Coinsurance", undefined, "Copay vs Coinsurance"),
                         builder.CardAction.dialogAction(session, "Deductible/OOPM", undefined, "Deductible vs Out-of-Pocket Max"),
                         builder.CardAction.dialogAction(session, "In/OutOfNetwork", undefined, "In vs Out of Network"),
                         builder.CardAction.dialogAction(session, "Generic/Brand", undefined, "Generic vs Brand-Name Drug"),
-                        builder.CardAction.dialogAction(session, "Go Back", undefined, "Go Back")
+                        builder.CardAction.dialogAction(session, "Go Back to About My Plan", undefined, "Go Back")
                         ])
                     ]);
         session.send(insurance_101_card);
@@ -1061,18 +1070,27 @@ bot.beginDialogAction('In/OutOfNetwork', '/in_out_network');
 bot.dialog('/generic_brand_drug', [
 ]);
 bot.beginDialogAction('Generic/Brand', '/generic_brand_drug');
-
-
-// -----------------------------------------------
-// TODO: Analyze a Bill or Statement Uploaded by User -- Dialog Thread
-// -----------------------------------------------
-bot.dialog("/bill_analyzer", [
+// TODO: Go Back to "About My Plan" Menu
+bot.dialog("/go_back_about_plan", [
 	function(session, args, next){
-		session.send("Great! Medical bill are pretty confusing...Let me help you!");
+		session.sendTyping();
+		session.send("Ok, going back to 'About My Plan' Menu...");
+		session.sendTyping();
+		session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name });
+	}
+]);
+bot.beginDialogAction('Go Back to About My Plan', '/go_back_about_plan');
+
+// -----------------------------------------------
+// TODO: Analyze a Explanation of Benefits (EOB) Uploaded by User -- Dialog Thread
+// -----------------------------------------------
+bot.dialog("/eob_analyzer", [
+	function(session, args, next){
+		session.send("Great! Medical bill and EOBs are pretty confusing...Let me help you!");
     session.sendTyping();
     session.send("We take your privacy very seriously, so your information will not be misused in any way, when I analyze your bills for you.");
     // TODO: need to give user proper instruction on which button to click to upload, varies by channel
-    builder.Prompts.attachment(session, "Please upload your bill or Explanation of Benefits.");
+    builder.Prompts.attachment(session, "Please upload a bill or Explanation of Benefits.");
   },
   function(session, results, next){
     console.log("Result: " + JSON.stringify(results));
@@ -1117,7 +1135,7 @@ bot.dialog("/bill_analyzer", [
     // });
   }
 ]);
-bot.beginDialogAction('Bill Analyzer', '/bill_analyzer');
+bot.beginDialogAction('EOB Analyzer', '/eob_analyzer');
 
 // -----------------------------------------------
 // TODO: Send Tips and Advice to User -- Dialog Thread
