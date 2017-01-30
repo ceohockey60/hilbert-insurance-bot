@@ -32,5 +32,5 @@ ehthumbs.db
 Thumbs.db
 
 # Lecture notes and Jupyter files#
-*.pdf
-*.ipynb_checkpoints
+#*.pdf
+#*.ipynb_checkpoints
