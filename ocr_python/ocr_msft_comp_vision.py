@@ -7,7 +7,6 @@ import http.client, urllib.request, urllib.parse, urllib.error, base64, json
 ###############################################
 
 # NOTE: Replace the subscription_key string value with your valid subscription key.
-# subscription_key = '217e2f2f745f43adb98a3d906ac6df27'
 subscription_key = '217e2f2f745fXXXXXXXXXXX'
 
 # Microsoft: Computer Vision API endpoint

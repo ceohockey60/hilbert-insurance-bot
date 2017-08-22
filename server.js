@@ -103,8 +103,6 @@ var server = app.listen(process.env.PORT || process.env.port || 3000, function (
 var connector = new builder.ChatConnector({
     appId: 'f151af23-XXXXXXXXX',
     appPassword: '9LfaXXXXXXXXXXXXX'
-    // appId: 'f151af23-c361-42ea-a95a-866c7379ed1f',
-    // appPassword: '9LfaHPMdmc3LNo2Ox71qMBd'
 });
 
 var bot = new builder.UniversalBot(connector);
