@@ -1,7 +1,7 @@
 {
   "name": "bot_1",
   "version": "1.0.0",
-  "description": "First prototype of health insurance bot for Stanford Law School.",
+  "description": "First prototype of health insurance bot.",
   "main": "bot_1.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,23 +11,20 @@
     "insurance",
     "chatbot"
   ],
-  "author": "Kevin Xu (kxu2@stanford.edu)",
+  "author": "Kevin Xu (kevin.s.xu@gmail.com)",
   "license": "ISC",
   "dependencies": {
     "assert": "^1.4.1",
     "async": "^2.1.4",
     "body-parser": "^1.15.2",
-    "botbuilder": "^3.2.3",
+    "botbuilder": "^3.9.1",
     "cookie-parser": "^1.4.3",
     "express": "^4.14.0",
     "express-session": "^1.14.2",
     "express-subdomain": "^1.0.5",
     "fs": "0.0.1-security",
-    "logicjs": "^1.0.0",
-    "mongoose": "^4.7.2",
     "multer": "^1.2.1",
     "nodemailer": "^2.6.4",
-    "pengines": "^1.0.2",
     "python-shell": "^0.4.0",
     "restify": "^4.1.1"
   },

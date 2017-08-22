@@ -1,5 +1,6 @@
 "use strict";
-var msg = require('../Message');
+Object.defineProperty(exports, "__esModule", { value: true });
+var Message_1 = require("../Message");
 var CardImage = (function () {
     function CardImage(session) {
         this.session = session;
@@ -17,7 +18,7 @@ var CardImage = (function () {
             args[_i - 1] = arguments[_i];
         }
         if (text) {
-            this.data.alt = msg.fmtText(this.session, text, args);
+            this.data.alt = Message_1.fmtText(this.session, text, args);
         }
         return this;
     };

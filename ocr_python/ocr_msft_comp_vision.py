@@ -1,36 +1,50 @@
-"""
-    MSFT Computer Vision OCR API call script
-"""
-
-########### Python 3.2 #############
 import http.client, urllib.request, urllib.parse, urllib.error, base64, json
 
-def ocr_msft(url):
+###############################################
+### This python module communicates with Microsoft's
+### computer vision API to conduct OCR on images of
+### insurance EOBs being uploaded by the user
+###############################################
+
+# NOTE: Replace the subscription_key string value with your valid subscription key.
+# subscription_key = '217e2f2f745f43adb98a3d906ac6df27'
+subscription_key = '217e2f2f745fXXXXXXXXXXX'
+
+# Microsoft: Computer Vision API endpoint
+uri_base = 'westcentralus.api.cognitive.microsoft.com'
+
+def comp_vision_msft(image_url):
     headers = {
-        # Request headers
+        # Request headers.
         'Content-Type': 'application/json',
-        'Ocp-Apim-Subscription-Key': 'd1e609fa66914785b879ee1aaf4b9262',
+        'Ocp-Apim-Subscription-Key': subscription_key,
     }
 
     params = urllib.parse.urlencode({
-        # Request parameters
         'language': 'unk',
         'detectOrientation ': 'true',
     })
 
+
     try:
-        conn = http.client.HTTPSConnection('api.projectoxford.ai')
-        conn.request("POST", "/vision/v1.0/ocr?%s" % params, "{'url': '" + url + "'}", headers)
+        # Execute the REST API call and get the response.
+        conn = http.client.HTTPSConnection(uri_base)
+        conn.request("POST", "/vision/v1.0/ocr?%s" % params, "{'url': '" + image_url + "'}", headers)
         response = conn.getresponse()
         data = response.read()
-        ### Manipulate "data" HERE########
 
-        print(data)
+        # 'data' contains the JSON data. The following formats the JSON data for display.
+        parsed = json.loads(data.decode("utf-8"))
+        # print statement sends the resulting JSON object back to server.js to be handled by bot
+        print (parsed)
         conn.close()
-    except Exception as e:
-        print("[Errno {0}] {1}".format(e.errno, e.strerror))
 
+    except Exception as e:
+        print('Error:')
+        print(e)
+
+    ####################################
 if __name__ == "__main__":
-    url = input()
-    ocr_msft(url)
-####################################
+    image_url = input()
+    comp_vision_msft(image_url)
+

@@ -1,25 +1,31 @@
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var dlg = require('../dialogs/Dialog');
-var intent = require('../dialogs/IntentDialog');
-var luis = require('../dialogs/LuisRecognizer');
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var Dialog_1 = require("../dialogs/Dialog");
+var IntentDialog_1 = require("../dialogs/IntentDialog");
+var LuisRecognizer_1 = require("../dialogs/LuisRecognizer");
 var LuisDialog = (function (_super) {
     __extends(LuisDialog, _super);
     function LuisDialog(serviceUri) {
-        _super.call(this);
+        var _this = _super.call(this) || this;
         console.warn('LuisDialog class is deprecated. Use IntentDialog with a LuisRecognizer instead.');
-        var recognizer = new luis.LuisRecognizer(serviceUri);
-        this.dialog = new intent.IntentDialog({ recognizers: [recognizer] });
+        var recognizer = new LuisRecognizer_1.LuisRecognizer(serviceUri);
+        _this.dialog = new IntentDialog_1.IntentDialog({ recognizers: [recognizer] });
+        return _this;
     }
     LuisDialog.prototype.begin = function (session, args) {
         this.dialog.begin(session, args);
     };
     LuisDialog.prototype.replyReceived = function (session, recognizeResult) {
-        this.dialog.replyReceived(session, recognizeResult);
     };
     LuisDialog.prototype.dialogResumed = function (session, result) {
         this.dialog.dialogResumed(session, result);
@@ -40,5 +46,5 @@ var LuisDialog = (function (_super) {
         return this;
     };
     return LuisDialog;
-}(dlg.Dialog));
+}(Dialog_1.Dialog));
 exports.LuisDialog = LuisDialog;

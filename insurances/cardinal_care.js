@@ -1,6 +1,12 @@
-// This is the coded version of Stanford Cardinal Care insurance plan for students.
-
 "use strict";
+
+//=========================================================
+// This module models basic terms, conditions and procedures
+// covered by Stanford's Cardinal Care Plan, which is offered
+// to all students. 
+// Source: insurance plan's Evidence of Benefits document
+//=========================================================
+
 
 // Name and Carrier
 exports.planName = function(){
@@ -14,9 +20,7 @@ exports.carrierName = function(){
 // Out-of-Pocket Maximum and Deductible Section
 // ---------------------------------------------
 
-// QUESTION: OOPM tracks all copays and coinsurance payments (?) Deductibles tracks just payments made for services (?)
 exports.outOfPocketMax = function(){
-	// TODO: implement tracking of out of pocket amount
 	var oopm = 2000;
 	return oopm;
 };
@@ -124,7 +128,7 @@ exports.coverageCopay= function(query, coverage_Q_flag){
 			"price": 0, 
 			"certification" : true,
 			"message": "There's no copay as long as it's not a bariatric (weight-loss) surgery. Make sure you get certification for the surgery first, by calling your insurer at " + pre_auth_phone_number + ", at least 5 business days before. Otherwise you could be subject to a $500 penalty."	
-		},
+		},		
 		{
 			"service": "anesthetics",
 			"price": 0, 
@@ -264,9 +268,9 @@ exports.coverageCopay= function(query, coverage_Q_flag){
 			}
 			if (found){ // if a no-cert service is found in database
 				if (coverage_Q_flag){
-					return coverage_Q_yes_message + "The copay for " + copay_no_cert[index].service + " is $" + price_array(copay_no_cert[index].price) + ".";
+					return coverage_Q_yes_message + "Your copay for " + copay_no_cert[index].service + " is $" + price_array(copay_no_cert[index].price) + ".";
 				} else {
-					return "The copay for " + copay_no_cert[index].service + " is $" + price_array(copay_no_cert[index].price) + ".";
+					return "Your copay for " + copay_no_cert[index].service + " is $" + price_array(copay_no_cert[index].price) + ".";
 				}
 			} else { // Two scenarios: 1. generate copay question, which should trigger random response; 2. coverage question and service was not found
 				// general copay info requested by picking a random service from no_cert and with_cert categories
@@ -304,7 +308,7 @@ exports.coinsurance = function(query, coverage_Q_flag){ //ASSESS: too rigid, jus
 			}
 		}
 	}
-	//TODO: rethink these responses...
+
 	if (coverage_Q_flag){
 		return coverage_Q_no_message;
 	} else {

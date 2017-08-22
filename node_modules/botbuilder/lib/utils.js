@@ -1,5 +1,6 @@
 "use strict";
-var sprintf = require('sprintf-js');
+Object.defineProperty(exports, "__esModule", { value: true });
+var sprintf = require("sprintf-js");
 function clone(obj) {
     var cpy = {};
     if (obj) {

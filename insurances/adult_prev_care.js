@@ -1,5 +1,13 @@
 "use strict";
 
+//=========================================================
+// This module abstracts away the list of preventative care
+// services that are mandated by the Affordable Care Act 
+// which every insurance plan must cover for free, in HTML
+// so they can be emailed to any user.
+//=========================================================
+
+
 // List of Adult Preventative Care procedures in HTML form.
 exports.emailAdultPrevCare = function(){
 	return "<p><strong>Adult Preventative Care:</strong></p>" + 

@@ -3,7 +3,7 @@
  */
 'use strict';
 
-kaiBotApp.controller('HomeController', ['$scope', '$location', '$routeParams', '$resource', '$timeout', '$rootScope',
+hilbertBotApp.controller('HomeController', ['$scope', '$location', '$routeParams', '$resource', '$timeout', '$rootScope',
   function ($scope, $location, $routeParams, $resource, $timeout, $rootScope) {
     if ($scope.main) {
       $scope.main.dev_cred = '';
@@ -28,26 +28,6 @@ kaiBotApp.controller('HomeController', ['$scope', '$location', '$routeParams', '
             console.log(err);
           });
       };
-
-      console.log("I'm the HomeController...");
     }
   }]);
-//
-//kaiBotApp.controller('HomeController', ['$scope', '$location', '$routeParams', '$resource', '$rootScope',
-//  function ($scope, $location, $resource) {
-//    if ($scope.main) {
-//      //
-//      $scope.main.toRegister = function(){
-//        console.log("clicking Register...");
-//        $location.path('/register');
-//      };
-//
-//      $scope.main.toLogIn = function(){
-//        console.log("clicking Login...");
-//        $location.path('/login');
-//      };
-//
-//
-//      console.log("I'm the HomeController...");
-//    }
-//  }]);
+

@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="kaiBotApp" ng-controller="MainController">
+<html ng-app="hilbertBotApp" ng-controller="MainController">
     <head>
         <title>{{main.title}}</title>
 
@@ -27,27 +27,13 @@
         <script src="components/home/HomeController.js"></script>
         <link rel="stylesheet" type="text/css" href="components/home/home.css" />
 
-        <script src="components/login/LoginController.js"></script>
-        <link rel="stylesheet" type="text/css" href="components/login/login.css"/>
-
-        <script src="components/register/RegisterController.js"></script>
-        <link rel="stylesheet" type="text/css" href="components/register/register.css"/>
-
-        <script src="components/user-profile/UserProfileController.js"></script>
-        <link rel="stylesheet" type="text/css" href="components/user-profile/user-profile.css"/>
-
         <script src="components/dev/DevController.js"></script>
         <link rel="stylesheet" type="text/css" href="components/dev/dev.css"/>
 
     </head>
     <body>
         <div class="hero">
-          <!--This link is used to test MongoDB connection.-->
-          <!--<ul>-->
-            <!--<li><a href="/test/info">/test/info</a> - Return information about the Test Schema</li>-->
-          <!--</ul>-->
-
-          <div ng-view></div>  <!--Where different HTML templates are rendered-->
+          <div ng-view></div> 
         </div>
 
         <footer>
@@ -56,10 +42,9 @@
               <li><a href="#">About Us</a></li>
               <li><a href="#">Terms of Service</a></li>
               <li><a href="#">Privacy Policy</a></li>
-              <!--<li><a href="#">Press</a></li>-->
               <li><a href="#">Contact Us</a></li>
             </ul>
-            <p>&copy; 2016 KaiBot Inc. All rights reserved.</p>
+            <p>&copy; 2017 Hilbert Technologies, Inc. All rights reserved.</p>
           </div>
         </footer>
     </body>

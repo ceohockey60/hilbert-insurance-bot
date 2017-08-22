@@ -1,43 +1,29 @@
 //=========================================================
-// KAI Bot server.js is the node.js server that contains all the
+// Hilbert Bot server.js is the node.js server that contains all the
 // features, logic, and functionalities that power the bot
-// This file also containts all API endpoints to power a simple
-// webapp that supports the bot
 //=========================================================
 
 //=========================================================
-// Current Features:
+// Current Functionalities:
 //=========================================================
 
-    // Insurance Coded: Stanford Cardinal Care
+    // Insurance Plan Modeled: Stanford Cardinal Care
 
-    // - Stanford Cardinal Care:
-    //     - natural language processing of user input
-    //     - collect minimum user profile information
-    //     - copay/coinsurance cost information of various services and treatments
-    //     - deductibles cost information
-    //         - deductibles cost tracking
-    //     - out of pocket max information
-    //         - out of pocket max cost tracking
-    //     - list of preventative care
-    //         - emailed to user
-    //     - answer coverage question using existing coverageCopay function
-    //     - ending conversation scheme
-    //         - delete user info if requested
-
-
-//=========================================================
-// Future Features:
-//=========================================================
-
-	// - Write Appeal Letter
-	// - Scan Itemized Bill or EOB for doctor billing errors
-  // - Plan Comparator based on user stories, situations, and contexts
-
+    // Stanford Cardinal Care:
+    //     - natural language processing of user input on questions related to medical 
+    //       coverage contextulized in Stanford Cardinal Care insurance plan
+    //     - OCR (using Microsoft computer vision API) to scrape raw information from
+    //       an EOB that user uploads as an image
+    //     - educational information on insurance terms:
+    //           copay/coinsurance 
+    //           deductibles/out-of-pocket maxiumum
+    //           in and out-of-network providers 
+    //     - educational cost information on appeal and claims process
+    //     - tracking of deductibles and out-of-pocket maximum 
+    //     - auto-email user a list of preventative care mandated by law
 
 "use strict";
 
-//var restify = require('restify');
 var builder = require('botbuilder');
 var emailer = require('nodemailer');
 
@@ -45,7 +31,10 @@ var emailer = require('nodemailer');
 var insurance_module;
 var tips_module = require("./insurances/general_tips.js");
 var insurance_101_module = require("./insurances/insurance_101.js");
-// Email agent for auto-emailing user information
+
+// Email agent for auto-emailing certain information to user from
+// ceohockey60@gmail.com (Kevin Xu's other email)
+// REPLACE: with your own email if you want to test out this feature
 var transporter = emailer.createTransport('smtps://ceohockey60%40gmail.com:crushit1986!@smtp.gmail.com');
 
 
@@ -54,7 +43,6 @@ var transporter = emailer.createTransport('smtps://ceohockey60%40gmail.com:crush
 //=========================================================
 
 // Express Server
-var mongoose = require('mongoose');
 var async = require('async');
 var express = require('express');
 var session = require('express-session');
@@ -62,29 +50,11 @@ var bodyParser = require('body-parser');
 var assert = require('assert');
 var multer = require('multer');
 var fs = require('fs');
-
-//TODO: Need to Salt and Hash password!!!
-
 var app = express();
 var router = express.Router();
 
-// Load Mongoose Data Schema
-var TestSchema = require('./schema/testSchema.js');
-var User = require('./schema/userSchema.js');
-
-// Mongodb local host connection
-//mongoose.connect('mongodb://localhost/kaiBotApp');
-
-//TODO: MongoDB integration with Azure not working yet...Server APIs are working but slow...
-// Mongodb Azure Cloud connection
-//var mongoClient = require("mongodb").MongoClient;
-//mongoClient.connect("mongodb://kaibotdb:gh2pnPOul3nzFNuOSMbxKncA4HYMlx3ldTLjx46GPYZOcrt9XuvmDmSxpwtsxDDBUsrPAuiKhXlDHIVVRXhUZQ==@kaibotdb.documents.azure.com:10250/?ssl=true", function (err, db) {
-// db.close();
-//});
-
 app.use(express.static(__dirname));
 
-// !!!NOTE: Each session state is current stored in Node memory, NOT OK for production.
 app.use(session({secret: 'secretKey', resave: false, saveUninitialized: false}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -95,178 +65,16 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
  * URL /- Homepage, render index.html
  */
 app.get('/', function (req, res) {
-  //res.sendFile('index.html');
   res.send("exposing local public folder...");
 });
 
-/*
- * URL /test/info - To test MongoDB connectivity on local server
- */
-//app.get('/test/info', function (req, res) {
-//  var createTestSchema = function(){
-//    return TestSchema.create({
-//      version: '1.0'
-//    }, function(err, test){
-//      if (err){
-//        console.log(err);
-//        console.log("test creation didn't work...");
-//      } else {
-//        test.id = test._id;
-//        console.log("test successfully created with id: " + test.id);
-//      }
-//    });
-//  };
-//  createTestSchema();
-//
-//  TestSchema.find({}, function (err, info) {
-//    if (err) {
-//      // Query returned an error.  We pass it back to the browser with an Internal Service
-//      // Error (500) error code.
-//      console.error('Doing /user/info error:', err);
-//      res.status(500).send(JSON.stringify(err));
-//      return;
-//    }
-//    if (info.length === 0) {
-//      // Query didn't return an error but didn't find the SchemaInfo object - This
-//      // is also an internal error return.
-//      res.status(500).send('Missing TestSchema Info');
-//      return;
-//    }
-//    // We got the object - return it in JSON format.
-//    console.log('TestSchema', info[0]);
-//    res.end(JSON.stringify(info[0]));
-//  });
-//});
 
 /*
- * URL /user/:userId - Get a user's info by userId
- * It also ties user info to current chatbot session to provide immediate context to conversation
- */
-//app.get('/user/:userId', function(req, res){
-//  var user_id = req.params.userId;
-//  if (req.session.loggedIn){
-//    console.log("Access to user with id: " + user_id + " has been requested...");
-//    User.findOne({_id: user_id}, function(err, user){
-//      if (err){
-//        res.status(400).send("This user id is not matched to a valid user...");
-//        return;
-//      }
-//      var found_user = JSON.parse(JSON.stringify(user));
-//      delete found_user.__v;
-//      console.log(JSON.stringify(found_user));
-//      // TODO: set up user info into chatbot session
-//      res.end(JSON.stringify(found_user));
-//    })
-//  } else {
-//    console.log("Unauthorized request to access user with id: " + user_id);
-//    res.status(401).send("Unauthorized request to access user info with id: " + user_id);
-//  }
-//});
-
-/*
- * URL /user-registration - Validate and Create new User object
- */
-//app.post('/user-registration', function(req, res){
-//  var first_name = req.body.first_name;
-//  var last_name = req.body.last_name;
-//  var email = req.body.email;
-//  //TODO: Need to Salt and Hash password!!!
-//  var password = req.body.password;
-//  var state_of_res = req.body.state_of_res;
-//  var insurance_plan_name = req.body.insurance_plan_name;
-//
-//  console.log("Testing state field: " + state_of_res);
-//
-//  User.findOne({email: email}, function (err, user){
-//    if (err){
-//      console.log("There'an error....");
-//      res.status(400).send("There's an error while registering user. Error msg: " + err);
-//      return;
-//    }
-//    if (user){
-//      res.status(400).send("A user with this email already exists...");
-//      console.log("Email already exist...");
-//    } else {
-//      console.log("Creating new user now...");
-//      User.create({
-//        id: '0',
-//        first_name: first_name,
-//        last_name: last_name,
-//        email: email,
-//        password: password,
-//        state_of_res: state_of_res,
-//        insurance_plan_name: insurance_plan_name,
-//        insurance_group_number: '',
-//        insurance_plan_object: undefined, // Insurance Object that's matched to the insurance plan User has
-//        num_issues_resolved: 0,
-//        common_questions: []
-//      }, function (err, newUser){
-//        if (err){
-//          res.status(400).send("Error occurred while creating new user. Error msg: " + err);
-//          console.log("Error occurred while creating new user...");
-//        } else {
-//          newUser.id = newUser._id;
-//          console.log("Created new user with id: " + newUser.id);
-//          res.status(200).send("Created new user with id: " + newUser.id);
-//        }
-//      })
-//    }
-//  });
-//});
-
-/*
- * URL /admin/login - Validate and Log In a User
- */
-//app.post('/admin/login', function (req, res){
-//  var email = req.body.email;
-//  var password = req.body.password;
-//  console.log("Trying to log in user with email: " + email + "...");
-//  User.findOne({email: email, password: password}, function (err, user){
-//    if (err){
-//      res.status(400).send("There's an error while logging in...");
-//      return;
-//    }
-//    if (!user){
-//      res.status(400).send("No user with this email was found...");
-//      return;
-//    }
-//    console.log("Current Session id: " + req.session.id);
-//    req.session.user_id = user.id;
-//    req.session.email = user.email;
-//    req.session.first_name = user.first_name;
-//    req.session.last_name = user.last_name;
-//    req.session.loggedIn = true;
-//
-//    res.send(JSON.stringify(user));
-//  });
-//});
-
-/*
- * URL /admin/logout - Log out a User and delete associated session
- */
-//app.post('/admin/logout', function(req, res){
-//  delete req.session.user_id;
-//  delete req.session.email;
-//  delete req.session.first_name;
-//  delete req.session.last_name;
-//  delete req.session.loggedIn;
-//
-//  req.session.destroy(function (err){
-//    if (err) {
-//      console.log(err + ": this user currently not logged in...");
-//      res.status(400).send("User currently not logged in...");
-//    } else {
-//      res.status(200).send("Logging out successful...");
-//    }
-//  });
-//});
-
-/*
- * URL /dev-login - Log in a visitor to access chatbot for testing, using a pre-determined passcode
+ * URL /dev-login - Log in a visitor to access chatbot for testing
  */
 app.post('/dev-login', function (req, res){
   var passcode = req.body.dev_cred;
-  if (passcode === 'ilovekai'){
+  if (passcode === 'gohilbert'){
     console.log("access success!!");
     res.status(200).send("Access Granted");
   } else {
@@ -291,39 +99,39 @@ var server = app.listen(process.env.PORT || process.env.port || 3000, function (
 //=========================================================
 
 // Create chat bot
+// NOTE: please change to your own Microsoft Bot Framework credentials
 var connector = new builder.ChatConnector({
-    appId: 'f151af23-c361-42ea-a95a-866c7379ed1f',
-    appPassword: '9LfaHPMdmc3LNo2Ox71qMBd'
+    appId: 'f151af23-XXXXXXXXX',
+    appPassword: '9LfaXXXXXXXXXXXXX'
+    // appId: 'f151af23-c361-42ea-a95a-866c7379ed1f',
+    // appPassword: '9LfaHPMdmc3LNo2Ox71qMBd'
 });
 
 var bot = new builder.UniversalBot(connector);
 app.post('/api/messages', connector.listen());
 
+
 //=========================================================
 // Bots Dialogs
 //=========================================================
-
-//MACRO TODO: comb every message to make sure it is <160 chars (limit for one SMS msg)
 
 // -----------------------------------------------
 // Root Dialog Thread
 // -----------------------------------------------
 
-// TODO: need userData.profile info integration with /user/:userId endpoint.
 bot.dialog('/', [
     function (session) {
     	session.sendTyping();
     	if (session.userData.profile){ // Returning User
     		session.send("Hi %s, thanks for reaching out again.", session.userData.profile.name);
 			session.sendTyping();
-			// TOFIX: Re-binding insurance plan; would need a way to search through plan database based on
-            // userData.profile.insurancePlanName
+            // NOTE: current bot setup defaults to Stanford Cardinal Care plan information
 			insurance_module = require('./insurances/cardinal_care.js');
 			session.sendTyping();
     		session.beginDialog('/home', { reprompt: true, name: session.userData.profile.name });
     	} else { // New user
 			function msg1(){
-				session.send("Hey, this is KAI!");
+				session.send("Hey, this is Hilbert!");
 				session.sendTyping();
 				session.send("I can help you with your health insurance questions and keep track of important expenses.");
     			session.sendTyping();
@@ -332,38 +140,29 @@ bot.dialog('/', [
 	    		session.beginDialog('/buildProfile', session.userData.profile);
 			}
 			msg1();
-			setTimeout(msg2, 2000);
+			setTimeout(msg2, 1000);
     	}
     },
     function (session, results) {
     	if (results.response){
     		session.userData.profile = results.response;
-    		// For testing user profile data fields:
+    		// For Debugging: shows user profile data fields
     		console.log("Name: %s; State: %s; Insurance Plan: %s", session.userData.profile.name, session.userData.profile.state, session.userData.profile.insurancePlanName);
-    		// TODO: binding globar var insurance_module dynamically to userData.profile.insurancePlanName
     		insurance_module = require('./insurances/cardinal_care.js');
-
 	    	session.sendTyping();
 	        session.beginDialog('/home', { reprompt: true, name: session.userData.profile.name });
     	}
-    	//} else { //If buidling profile failed...relaunch building profile dialog.
-	    // 	session.sendTyping();
-    	// 	session.beginDialog('/buildProfile', session.userData.profile);
-	    // }
     }
 ]);
-// HOME option for Card, routing
-// bot.beginDialogAction('', '/');
 
 
 // -----------------------------------------------
 // Build User Profile -- Dialog Thread
 // -----------------------------------------------
 
-// TODO: Need to incorporate EndConversation intent, so user can say "Goodbye" at all times
-// TODO: Simplify intake of info--may not need zipcode, change to State of Residence?
+// TODO: Need authentication of user input
 bot.dialog('/buildProfile', [
-    function (session, args, next) {  //TODO: This interaction need fixing!!
+    function (session, args, next) { 
     	function msg1(){
 	    	session.send("I don't think we've met before. First, let me ask you a few basic questions to get things started.");
     		session.sendTyping();
@@ -377,15 +176,14 @@ bot.dialog('/buildProfile', [
             	next();
        		}
     	}
-    	setTimeout(msg1, 2000);
-    	setTimeout(msg2, 4000);
+    	setTimeout(msg1, 1000);
+    	setTimeout(msg2, 2000);
     },
     function (session, results, next) {
         if (results.response) {
             session.dialogData.profile.name = results.response;
         }
         if (!session.dialogData.profile.state) {
-            //TODO: need input authentication
             session.sendTyping();
             builder.Prompts.text(session, "Which state do you live in?\n (e.g. CA, OH, etc.)");
         } else {
@@ -397,10 +195,8 @@ bot.dialog('/buildProfile', [
             session.dialogData.profile.state = results.response;
         }
         if (!session.dialogData.profile.insurancePlanName){
-            //TODO: need input authentication
-            //TODO: handle case if user doesn't have insurance!
             session.sendTyping();
-        	builder.Prompts.text(session, "What's the name of your insurance plan? (e.g. Stanford Cardinal Care)");
+        	builder.Prompts.text(session, "What's the name of your insurance plan? (Defaulted to: Stanford Cardinal Care)");
         } else {
         	next();
         }
@@ -416,6 +212,7 @@ bot.dialog('/buildProfile', [
     }
 ]);
 
+
 // -----------------------------------------------
 // Home Menu Dialog
 // -----------------------------------------------
@@ -427,15 +224,9 @@ bot.dialog('/home', [
 	    		.attachments([
 	    			new builder.HeroCard(session)
 	    				.title("What would you like to do, %s?", args.name)
-	    				.buttons([ //TODO: maybe add a "Feedback" button here...??
-	    					//TODO: make second param string more user friendly, for SMS layout.
-	    					//ISSUE: if button is clicked many times, they dialog will be triggered as many times....
+	    				.buttons([
 	    					builder.CardAction.dialogAction(session, "Query", undefined, "About My Plan"),
-	    					// builder.CardAction.dialogAction(session, "Insurance 101", undefined, "Insurance 101"),
-	    					// builder.CardAction.dialogAction(session, "Appeal", undefined, "Appeal Process"),
-	    					builder.CardAction.dialogAction(session, "EOB Analyzer", undefined, "Explanation of Benefits Analysis"),
-	    					//builder.CardAction.dialogAction(session, "Estimate Cost", undefined, "Estimate Cost"),
-	    					// builder.CardAction.dialogAction(session, "Tips", undefined, "Tips & Advice"),
+	    					builder.CardAction.dialogAction(session, "EOB Analyzer", undefined, "Explanation of Benefits (EOB) Analysis"),
 	    					builder.CardAction.dialogAction(session, "Exit", undefined, "End Conversation")
 	    					])
 	    				]);
@@ -447,7 +238,6 @@ bot.dialog('/home', [
 // -----------------------------------------------
 // Guided Choices about User's Insurance Plan -- Dialog Thread
 // -----------------------------------------------
-// bot.dialog('/query', intents);
 bot.dialog('/query', [
 	function(session, args, next){
 		// console.log("Query args: " + args.data.name);
@@ -457,13 +247,10 @@ bot.dialog('/query', [
 				new builder.HeroCard(session)
 					.title("Select one of these topics about your plan.")
 					.buttons([
-						builder.CardAction.dialogAction(session, "Medical Coverage", undefined, "Medical Coverage"),
-						builder.CardAction.dialogAction(session, "Mental Health Coverage", undefined, "Mental Health Coverage"),
-						builder.CardAction.dialogAction(session, "Prescription Drug", undefined, "Prescription Drug"),
+						builder.CardAction.dialogAction(session, "Medical Coverage", undefined, "Questions About Medical Coverage"),
 						builder.CardAction.dialogAction(session, "Insurance 101", undefined, "Insurance 101"),
-						builder.CardAction.dialogAction(session, "My Plan Basics", undefined, "My Plan Basics"),
-						builder.CardAction.dialogAction(session, "HSA FSA", undefined, "HSA FSA Management"),
-						builder.CardAction.dialogAction(session, "Go Back", undefined, "Go Back")
+                        builder.CardAction.dialogAction(session, "Appeal", undefined, "Learn About Appeal"),
+                        builder.CardAction.dialogAction(session, "Go Back", undefined, "Go Back")
 						])
 					]);
 		session.send(query_card);
@@ -472,10 +259,9 @@ bot.dialog('/query', [
 ]);
 bot.beginDialogAction('Query', '/query');
 
-// TODO: -----------------------------------------------
+// -----------------------------------------------
 // Ask Questions about User's Insurance Plan -- Dialog Thread
 // -----------------------------------------------
-// [TO-IMPROVE]: Unique NLP recognizer for Medical Coverage related natural language questions
 var model_medical_coverage = 'https://api.projectoxford.ai/luis/v1/application?id=687b2a4b-d72f-4db0-aa82-c82ee3efaa22&subscription-key=a97f639bea8044f49d0aa1661f5b417b';
 var recognizer_medical_coverage = new builder.LuisRecognizer(model_medical_coverage);
 var medical_coverage_intents = new builder.IntentDialog({recognizers: [recognizer_medical_coverage]});
@@ -493,20 +279,16 @@ medical_coverage_intents.onBegin(function (session, args, next){
 	}
 });
 
+// -----------------------------------------------
+// Handles All User Intents that Ask Questions about Basic Medical Coverage related cost 
+// -----------------------------------------------
+
 medical_coverage_intents.matches('AskQuestion', [
     function (session, args, next){
     	console.log("This is args: " + JSON.stringify(args));
-        //var basic_info_entities = builder.EntityRecognizer.findEntity(args.entities, 'BasicInsuranceInfo');
-        // console.log("Current entities: " + JSON.stringify(basic_info_entities));
-        // if (!basic_info_entities){
-        // 	session.sendTyping();
-        //     session.send("Sorry, I didn't quite understand your question.");
-        //     session.sendTyping();
-        //     session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name, bad_phrasing:
-        // true }); } else {
         next({ response: args.entities });
-        //}
     },
+    //Answer basic questions regarding the insurance plan's copays, deductibles, out-of-pocket max, and basic coverage questions.
     function (session, results, next){
         if (results.response[0] != null){
         	console.log("This is entity results: " + JSON.stringify(results.response));
@@ -518,12 +300,10 @@ medical_coverage_intents.matches('AskQuestion', [
                 session.send(reply);
                 session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name });
             } else if (results.response[0].type.includes('BasicInsuranceInfo::deductible')){ // (Entity: deductible)
-				// NOTE: Deductibles works different depending on plan's terms and conditions
 				session.sendTyping();
                 var reply = insurance_module.deductible(session.message.text);
                 session.sendTyping();
                 session.send(reply);
-                // TODO: if deductible is $0, then may need a different behavior re: tracking.
                 if (session.userData.profile.hasOwnProperty("deductible")){ //Giving user update on current deductible spending
                 	session.sendTyping();
                 	session.send("Just FYI, you have spent $" + session.userData.profile.deductible + " on deductibles so far this year.");
@@ -533,7 +313,6 @@ medical_coverage_intents.matches('AskQuestion', [
                 	session.sendTyping();
                 	next({ deductible_dialog: true });
                 }
-                //session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name });
             } else if (results.response[0].type.includes('BasicInsuranceInfo::out_of_pocket_max')){ // (Entity: out of pocket max)
             	// NOTE: OOPM works different depending on plan's terms and conditions
             	session.sendTyping();
@@ -593,11 +372,10 @@ medical_coverage_intents.matches('AskQuestion', [
     		console.log("Starting oopm tracking...");
     		session.sendTyping();
     		session.beginDialog('/trackOOPM');
-    	} else if (results.response){ //TODO: this defaults to email address entry, but needs validation scheme
+    	} else if (results.response){ 
+            // TODO: this defaults to email address entry, but needs validation scheme
     		// Emailer Code Snippet:
     		session.userData.profile.email = results.response;
-        //TOFIX: on Slack, results.response is "<mailto:kevin.s.xu@gmail.com|kevin.s.xu@gmail.com>"
-        //so current snippet won't work...
     		var email_addr = results.response;
 
     		session.send("Great! I'll send this list to " + email_addr + " right now...");
@@ -611,10 +389,11 @@ medical_coverage_intents.matches('AskQuestion', [
             var prev_care_file = require('./insurances/adult_prev_care.js');
             var email_body = prev_care_file.emailAdultPrevCare();
 
+            // NOTE: please change to your own email to test out this function
             var mailOptions = {
-            	from: '"KAI" <ceohockey60@gmail.com>',
+            	from: '"Hilbert" <ceohockey60@gmail.com>',
             	to: email_addr,
-            	subject: 'Adult Preventative Care - Sent by KAI',
+            	subject: 'Adult Preventative Care - Sent by Hilbert',
             	html: email_body
             };
             transporter.sendMail(mailOptions, function (err, info){
@@ -657,76 +436,9 @@ medical_coverage_intents.matches('AskQuestion', [
     }
 ]);
 
-medical_coverage_intents.matches('UpdateProfile', [
-    function (session, args, next){
-        // TOFIX: INSURANCE has trouble persisting, this is a TEMP fix:
-        // INSURANCE = require('./insurances/cardinal_care.js');
-        // console.log("This is args: " + JSON.stringify(args));
-		//console.log("Module is: " + typeof(session.userData.profile.insuranceModule));
-
-        next({ response: args.entities });
-    },
-    function (session, results, next){
-        console.log("Current entities: " + results.response);
-        if (results.response[0] != null){
-            if (results.response[0].type.includes('BasicInsuranceInfo::deductible')) {
-                if (session.userData.profile.hasOwnProperty("deductible")){ //Giving user update on current deductible spending
-                    session.sendTyping();
-                    // session.send("So far, you've spent $" + session.userData.profile.deductible + " on deductibles
-                    // so far this year."); session.sendTyping();
-                    session.beginDialog('/trackDeductible', { trigger_deductible_update: true });
-                } else { //Asking user if she likes bot to track her deductible spending
-                    session.sendTyping();
-                    session.send("So I haven't been asked to track your deductibles before...");
-                    session.beginDialog('/trackDeductible');
-                }
-            } else if (results.response[0].type.includes('BasicInsuranceInfo::out_of_pocket_max')){
-                if (session.userData.profile.hasOwnProperty("oopm")){ //Giving user update on current oopm spending
-                    session.sendTyping();
-                    //session.send("So far, you've spent $" + session.userData.profile.oopm + " of the $" + oopm + "
-                    // out-of-pocket maximum you have for the year.");
-                    session.beginDialog('/trackOOPM', { trigger_oopm_update: true });
-                } else { //Asking user if she likes bot to track her oopm spending
-                    session.sendTyping();
-                    session.send("So I haven't been asked to track your out-of-pocket maximum before...");
-                    session.beginDialog('/trackOOPM');
-                }
-            } else { // Catch all for other things Kai is not tracking yet...
-                session.send("Sorry, I didn't quite understand your request.");
-                session.sendTyping();
-                session.replaceDialog('/medical_coverage', { reprompt: true, name: session.userData.profile.name });
-            }
-        } else { // When no UpateProfile intent entity is found...
-            session.send("Sorry, I didn't quite understand your request.");
-            session.sendTyping();
-            session.replaceDialog('/medical_coverage', { reprompt: true, name: session.userData.profile.name });
-        }
-    },
-    function(session, results){
-        //TODO: need friendly warning when getting close to limit...
-        if (results.tracking_deductible){
-            console.log("Doing deductible tracking...");
-            if (isNaN(session.userData.profile.deductible)){
-                session.userData.profile.deductible = 0;
-            }
-            session.sendTyping();
-            session.userData.profile.deductible += results.response;
-            session.send("Got it. Your most updated deductible spending is now $" + session.userData.profile.deductible + ". We will continue to track from here.");
-        } else if (results.tracking_oopm){
-            console.log("Doing OOPM tracking...");
-            if (isNaN(session.userData.profile.oopm)){
-                session.userData.profile.oopm = 0;
-            }
-            session.sendTyping();
-            session.userData.profile.oopm += results.response;
-            session.send("Got it. Your most updated out-of-pocket maximum spending is now $" + session.userData.profile.oopm + ". We will continue to track from here.");
-        } else {
-            console.log("Not tracking anything...");
-        }
-        session.sendTyping();
-        session.replaceDialog('/medical_coverage', { reprompt: true, name: session.userData.profile.name });
-    }
-]);
+// -----------------------------------------------
+// Reroutes all User intent related to appeal process to the Appeal dialog thread  
+// -----------------------------------------------
 
 medical_coverage_intents.matches('Appeal', [
 	function(session, args){
@@ -734,13 +446,13 @@ medical_coverage_intents.matches('Appeal', [
 	}
 ]);
 
+// -----------------------------------------------
+// Reroutes all User intent related to Ending Conversation to the End Conversation dialog thread  
+// -----------------------------------------------
+
 medical_coverage_intents.matches('EndConversation', [
 	function (session, args){
-		//console.log("This is args: " + JSON.stringify(args));
 		session.beginDialog('/exit');
-		// TODO: may be change this to Prompts.choice to make better UI.
-        // builder.Prompts.confirm(session, "Would you like me to delete all your user info as you leave? (e.g.
-        // tracking of deductibles, zipcode, age, etc.) You will have to re-enter them again next time we chat...");
 	}
 ]);
 
@@ -750,90 +462,6 @@ medical_coverage_intents.onDefault(function(session, args){
 	session.replaceDialog('/medical_coverage', { reprompt: true, name: session.userData.profile.name });
 });
 
-// TODO: ---------------------------------------------------------
-// [TO-IMPROVE]: Unique NLP recognizer for Mental Health Coverage related natural language questions
-// ---------------------------------------------------------
-// TODO: Add extra message to communicate commitment to user privacy
-var model_mental_health_coverage = 'https://api.projectoxford.ai/luis/v2.0/apps/a26d804b-8d51-45c4-909a-df497c3bb844?subscription-key=a97f639bea8044f49d0aa1661f5b417b';
-var recognizer_mental_health = new builder.LuisRecognizer(model_mental_health_coverage);
-var mental_health_intents = new builder.IntentDialog({recognizers: [recognizer_medical_coverage]});
-
-bot.dialog("/mental_health_coverage", mental_health_intents);
-bot.beginDialogAction('Mental Health Coverage', '/mental_health_coverage');
-
-mental_health_intents.onBegin(function (session, args, next){
-	if (args.reprompt){
-		session.sendTyping();
-		session.send("What other question about your plan's mental health coverage can I help you with?");
-	} else {
-		session.send("OK, I can help you out with figuring out medical coverage of your plan.");
-		session.sendTyping();
-		session.send("What's your question?");
-	}
-});
-
-// Build out
-// More
-// Intents!!
-
-mental_health_intents.onDefault(function(session, args){
-	session.send("Sorry, I didn't understand your question.");
-	session.replaceDialog('/mental_health_coverage', { reprompt: true, name: session.userData.profile.name });
-});
-
-
-// TODO: ---------------------------------------------------------
-// [TO-IMPROVE]: Unique NLP recognizer for Prescription Drug related natural language questions
-// ---------------------------------------------------------
-var model_prescription_drug_coverage = 'https://api.projectoxford.ai/luis/v2.0/apps/ccb69690-3409-4b7f-9e45-dbdb2d09583c?subscription-key=a97f639bea8044f49d0aa1661f5b417b';
-var recognizer_prescription_drug = new builder.LuisRecognizer(model_prescription_drug_coverage);
-var prescription_drug_intents = new builder.IntentDialog({recognizers: [recognizer_prescription_drug]});
-
-bot.dialog("/prescription_drug_coverage", prescription_drug_intents);
-bot.beginDialogAction('Prescription Drug', '/prescription_drug_coverage');
-
-prescription_drug_intents.onBegin(function (session, args, next){
-	if (args.reprompt){
-		session.sendTyping();
-		session.send("What other question about your plan's prescription drug coverage can I help you with?");
-	} else {
-		session.send("OK, I can help you out with figuring out prescription drug coverage of your plan.");
-		session.sendTyping();
-		session.send("What's your question?");
-	}
-});
-
-// Build out
-// More
-// Intents!!
-
-prescription_drug_intents.onDefault(function(session, args){
-	session.send("Sorry, I didn't understand your question.");
-	session.replaceDialog('/prescription_drug_coverage', { reprompt: true, name: session.userData.profile.name });
-});
-
-
-// TODO: My Plan Basics Option
-bot.dialog("/my_plan_basics", [
-	function(session, args, next){
-		session.sendTyping();
-		session.send("Coming soon...");
-		session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name });
-		session.sendTyping();
-	}
-]);
-bot.beginDialogAction('My Plan Basics', '/my_plan_basics');
-
-// TODO: HSA FSA management option
-bot.dialog('/hsa_fsa_query', [
-	function(session, args, next){
-		session.sendTyping();
-		session.send("HSA & FSA management features coming soon...");
-		session.replaceDialog('/query', { reprompt: true, name: session.userData.profile.name });
-		session.sendTyping();
-	}
-]);
-bot.beginDialogAction('HSA FSA', '/hsa_fsa_query');
 
 // TODO: Go Back Option
 bot.dialog("/go_back_home", [
@@ -846,10 +474,6 @@ bot.dialog("/go_back_home", [
 ]);
 bot.beginDialogAction('Go Back', '/go_back_home');
 
-
-// ****************************
-// ASSESS: whether deductibles and oopm should be tracked together, since their purpose overlaps.
-// ****************************
 
 // QUERY Sub-Dialog: Handle user trackDeductible Dialog Thread
 bot.dialog('/trackDeductible', [
@@ -933,7 +557,7 @@ bot.dialog('/trackOOPM', [
 );
 
 // -----------------------------------------------
-// TODO: Insurance 101 -- Dialog Thread
+// Insurance 101 -- Dialog Thread
 // -----------------------------------------------
 bot.dialog('/insurance101', [
 	function(session, args, next){
@@ -942,12 +566,9 @@ bot.dialog('/insurance101', [
                 new builder.HeroCard(session)
                     .title("Insurance 101")
                     .buttons([
-                        builder.CardAction.dialogAction(session, "EOB", undefined, "Evidence of Benefits"),
-						builder.CardAction.dialogAction(session, "My Plan Basics", undefined, "My Plan Basics"),
                         builder.CardAction.dialogAction(session, "Copay/Coinsurance", undefined, "Copay vs Coinsurance"),
                         builder.CardAction.dialogAction(session, "Deductible/OOPM", undefined, "Deductible vs Out-of-Pocket Max"),
                         builder.CardAction.dialogAction(session, "In/OutOfNetwork", undefined, "In vs Out of Network"),
-                        builder.CardAction.dialogAction(session, "Generic/Brand", undefined, "Generic vs Brand-Name Drug"),
                         builder.CardAction.dialogAction(session, "Go Back to About My Plan", undefined, "Go Back")
                         ])
                     ]);
@@ -956,24 +577,20 @@ bot.dialog('/insurance101', [
 ]);
 bot.beginDialogAction('Insurance 101', '/insurance101');
 
-//TODO: Change Content...
-bot.dialog('/eob_info', [
-]);
-bot.beginDialogAction('EOB', '/eob_info');
-// TODO: Change Content...
+// SubDialog to show user information regarding copay and coinsurance
 bot.dialog('/copay_coinsurance_info', [
     function(session, args, next){
         session.sendTyping();
         session.send(insurance_101_module.copayCoinsuranceInfo(0));
         session.sendTyping();
-        builder.Prompts.confirm(session, "Would you like to know more about copay and coinsurance?");
+        builder.Prompts.confirm(session, "Would you like to know more about copay and coinsurance? [y/n]");
     },
     function(session, results, next){
         if (results.response){
             session.sendTyping();
             session.send(insurance_101_module.copayCoinsuranceInfo(1));
             session.sendTyping();
-            builder.Prompts.confirm(session, "Would you like to know more about copay and coinsurance?");
+            builder.Prompts.confirm(session, "Would you like to know more about copay and coinsurance? [y/n]");
         } else {
             session.sendTyping();
             session.send("Sounds good, let's go back to Insurance 101.");
@@ -1011,20 +628,21 @@ bot.dialog('/copay_coinsurance_info', [
     }
 ]);
 bot.beginDialogAction('Copay/Coinsurance', '/copay_coinsurance_info');
-// TODO: Change Content...
+
+// SubDialog to show user information regarding deductibles and out-of-pocket maximum
 bot.dialog('/deductible_oopm_info', [
     function(session, args, next){
         session.sendTyping();
-        session.send(insurance_101_module.deductibleInfo(0));
+        session.send(insurance_101_module.deductibleOOPMInfo(0));
         session.sendTyping();
-        builder.Prompts.confirm(session, "Would you like to know more about deductible?");
+        builder.Prompts.confirm(session, "Would you like to know more about how deductible or out-of-pocket maximum works? [y/n]");
     },
     function(session, results, next){
         if (results.response){
             session.sendTyping();
-            session.send(insurance_101_module.deductibleInfo(1));
+            session.send(insurance_101_module.deductibleOOPMInfo(1));
             session.sendTyping();
-            builder.Prompts.confirm(session, "Would you like to know more about deductible?");
+            builder.Prompts.confirm(session, "Would you like to know more about how deductible or out-of-pocket maximum works? [y/n]");
         } else {
             session.sendTyping();
             session.send("Sounds good, let's go back to Insurance 101.");
@@ -1034,7 +652,7 @@ bot.dialog('/deductible_oopm_info', [
     function(session, results, next){
         if (results.response){
             session.sendTyping();
-            session.send(insurance_101_module.deductibleInfo(2));
+            session.send(insurance_101_module.deductibleOOPMInfo(2));
             next();
         } else {
             session.sendTyping();
@@ -1044,7 +662,7 @@ bot.dialog('/deductible_oopm_info', [
     },
     function(session, results, next){
         session.sendTyping();
-        session.send("Hope that was some useful information on how deductible works.");
+        session.send("Hope that was some useful information on how deductible and out-of-pocket maxiumum works.");
         session.sendTyping();
         session.send("For more info specific to your health plan, definitely go back to Main Menu and use the 'Ask Question' tool.");
         builder.Prompts.choice(session, "Would you like to do more with Insurance 101 or go back to the main menu?", ["Insurance 101", "Main Menu"]);
@@ -1062,15 +680,61 @@ bot.dialog('/deductible_oopm_info', [
     }
 ]);
 bot.beginDialogAction('Deductible/OOPM', '/deductible_oopm_info');
-// TODO: Change Content...
+
+// SubDialog to show user information regarding in vs. out of network services
 bot.dialog('/in_out_network', [
+       function(session, args, next){
+        session.sendTyping();
+        session.send(insurance_101_module.inOutNetworkInfo(0));
+        session.sendTyping();
+        builder.Prompts.confirm(session, "Would you like to know more about how In vs. Out of Network works? [y/n]");
+    },
+    function(session, results, next){
+        if (results.response){
+            session.sendTyping();
+            session.send(insurance_101_module.inOutNetworkInfo(1));
+            session.sendTyping();
+            builder.Prompts.confirm(session, "Would you like to know more about how In vs. Out of Network works? [y/n]");
+        } else {
+            session.sendTyping();
+            session.send("Sounds good, let's go back to Insurance 101.");
+            session.replaceDialog('/insurance101');
+        }
+    },
+    function(session, results, next){
+        if (results.response){
+            session.sendTyping();
+            session.send(insurance_101_module.inOutNetworkInfo(2));
+            next();
+        } else {
+            session.sendTyping();
+            session.send("Sounds good, let's go back to Insurance 101.");
+            session.replaceDialog('/insurance101');
+        }
+    },
+    function(session, results, next){
+        session.sendTyping();
+        session.send("Hope that was some useful information on how In vs. Out of Network works.");
+        session.sendTyping();
+        session.send("For more info specific to your health plan, definitely go back to Main Menu and use the 'Ask Question' tool.");
+        builder.Prompts.choice(session, "Would you like to do more with Insurance 101 or go back to the main menu?", ["Insurance 101", "Main Menu"]);
+    },
+    function(session, results){
+        if (results.response.entity == "Insurance 101"){
+            session.sendTyping();
+            session.send("Cool, sounds good!");
+            session.replaceDialog('/insurance101');
+        } else {
+            session.sendTyping();
+            session.send("Great! Let's go back to the main menu...");
+            session.replaceDialog('/home', { reprompt: true, name: session.userData.profile.name });
+        }
+    }
 ]);
 bot.beginDialogAction('In/OutOfNetwork', '/in_out_network');
-// TODO: Change Content...
-bot.dialog('/generic_brand_drug', [
-]);
-bot.beginDialogAction('Generic/Brand', '/generic_brand_drug');
-// TODO: Go Back to "About My Plan" Menu
+
+
+// Return to About My Plan menu
 bot.dialog("/go_back_about_plan", [
 	function(session, args, next){
 		session.sendTyping();
@@ -1081,15 +745,15 @@ bot.dialog("/go_back_about_plan", [
 ]);
 bot.beginDialogAction('Go Back to About My Plan', '/go_back_about_plan');
 
+
 // -----------------------------------------------
-// TODO: Analyze a Explanation of Benefits (EOB) Uploaded by User -- Dialog Thread
+// Analyze a Explanation of Benefits (EOB) Uploaded by User -- Dialog Thread
 // -----------------------------------------------
 bot.dialog("/eob_analyzer", [
 	function(session, args, next){
 		session.send("Great! Medical bill and EOBs are pretty confusing...Let me help you!");
     session.sendTyping();
     session.send("We take your privacy very seriously, so your information will not be misused in any way, when I analyze your bills for you.");
-    // TODO: need to give user proper instruction on which button to click to upload, varies by channel
     builder.Prompts.attachment(session, "Please upload a bill or Explanation of Benefits.");
   },
   function(session, results, next){
@@ -1098,21 +762,21 @@ bot.dialog("/eob_analyzer", [
     // NOTE: file path after upload is: results.response[0].contentUrl
     var PythonShell = require('python-shell');
     var pyshell = new PythonShell('./ocr_python/ocr_msft_comp_vision.py', { mode: 'text', pythonPath: 'python3'}); //specify to run script on python3
+    console.log("Image url: " + results.response[0].contentUrl);
     console.log("sending file over to ocr script...");
     pyshell.send(results.response[0].contentUrl);
     console.log("ocr script now processing file...");
+
     pyshell.on('message', function (message) {
-            // received a message sent from the Python script (a simple "print" statement)
+        console.log("Raw message: " + message);   
         session.send("Here's what I can find for now...");
         session.sendTyping();
-        var json_formatted_msg = message.substring(2, message.length-1); //strip unnecessary chars to can be converted to JSON
-        console.log("Current JSON: " + (JSON.parse(json_formatted_msg)));
-        // send back entire JSON
-        session.send(JSON.stringify(JSON.parse(json_formatted_msg)));
-        // Prompt for more Bill related questions in the future, right now, just go back to home screen:
+        // Send Raw JSON object resulted from OCR to user for now
+        session.send(JSON.stringify(message));
+        // Go back to Home menu after OCR is finished
         session.replaceDialog('/home', { reprompt: true, name: session.userData.profile.name });
-        console.log("Language is: " + JSON.parse(json_formatted_msg).language);
     });
+    
     pyshell.end(function (err) {
         if (err) {
           session.send("Sorry, that didn't work...");
@@ -1121,67 +785,13 @@ bot.dialog("/eob_analyzer", [
         }
         console.log('ocr finished');
     });
-
-    // var options = {
-    //   mode: 'text',
-    //   args: [results.response[0].contentUrl]
-    // };
-    // PythonShell.run('./ocr_python/OCR_tesseract.py', options, function (err, results) {
-    //   console.log("now talking to OCR py script...");
-    //   if (err) throw err;
-    //   session.sendTyping();
-    //   session.send(results);
-    //   console.log('OCR result: ', results);
-    // });
   }
 ]);
 bot.beginDialogAction('EOB Analyzer', '/eob_analyzer');
 
-// -----------------------------------------------
-// TODO: Send Tips and Advice to User -- Dialog Thread
-// -----------------------------------------------
-bot.dialog('/tips', [
-    function(session, args, next){
-        if (args.reprompt){
-            session.sendTyping();
-            builder.Prompts.choice(session, "What else about your insurance or medical cost would you like some tips on?", ["Before Care", "After Care", "Communication Tips", "Exit"]);
-        } else {
-            session.sendTyping();
-            builder.Prompts.choice(session, "What aspect of your insurance or medical cost would you like some tips on?", ["Before Care", "After Care", "Communication Tips", "Exit"]);
-        }
-    },
-    function(session, results, next){
-        //var general_tips_module = require('./insurances/general_tips.js');
-        if (results.response.entity == "Before Care"){
-            session.sendTyping();
-            session.send(tips_module.preServiceTips());
-            session.sendTyping();
-            session.replaceDialog('/tips', { reprompt: true });
-        } else if (results.response.entity == "After Care"){
-            session.sendTyping();
-            session.send(tips_module.postServiceTips());
-            session.sendTyping();
-            session.replaceDialog('/tips', { reprompt: true });
-        } else if (results.response.entity == "Communication Tips"){
-            console.log("testing 1");
-            session.sendTyping();
-            session.send(tips_module.communicationTips());
-            session.sendTyping();
-            console.log("testing 2");
-            session.replaceDialog('/tips', { reprompt: true });
-        } else {
-            session.sendTyping();
-            session.send("Ok, sounds good. Back to the main menu...");
-            session.replaceDialog('/home', { reprompt: true, name: session.userData.profile.name });
-        }
-    }
-
-]);
-// TODO: add default state for Bye -> exit conversation?
-bot.beginDialogAction('Tips', '/tips');
 
 // ---------------------------------------------------------
-// TODO: Facilitate Dispute Resolution/ODR -- Dialog Thread
+// Facilitate Appeal and Claims Dispute Resolution -- Dialog Thread
 // ---------------------------------------------------------
 bot.dialog('/appeal', [
 	function(session, args, next){
@@ -1211,8 +821,8 @@ bot.dialog('/appeal', [
 			session.sendTyping();
 			var imr_info = insurance_module.imrInfo();
 			var arbitration_info = insurance_module.arbitrationInfo();
-			// IMR information:
-			function msg1(){
+
+			function msg1(){             // IMR information:
 				session.send("Another way to get your case heard is through the Independent Medical Review (IMR) with the " + imr_info.state + " government.");
 				session.sendTyping();
 				session.send("You can apply for an IMR, if " + insurance_module.carrierName() + " does not resolve your appeal satisfactorily within " + imr_info.imr_trigger_period_days + " days.");
@@ -1267,8 +877,6 @@ bot.dialog('/appeal', [
 			setTimeout(msg7, 30000);
 			setTimeout(msg8, 35000);
 		} else if (results.response.entity == "Tips" || results.response.entity == "More Tips") { //Choice: Tips/More Tips
-			// TODO: depending on which tip is shown, can prompt relevant functionalities (e.g. writing letter...)
-            //var appeal_tips_module = require('./insurances/general_tips.js');
 			session.sendTyping();
 			session.send(["I'll share this tip with you...", "Here's a good tip!", "Let me share this tip with you..."]);
 			session.sendTyping();
@@ -1277,8 +885,6 @@ bot.dialog('/appeal', [
 			session.replaceDialog('/appeal', { reprompt: true, ask_tip: true });
 		} else if (results.response.entity == "Write Appeal Letter"){ // Choice: auto-write appeal letter
             session.sendTyping();
-            //TODO: build document generation feature based on user input
-            //TODO: prompt a form for user to fill information for letter
             session.send("Stay tuned...I'll be able to write your appeal letter for you soon...");
             session.replaceDialog('/appeal', { reprompt: true, ask_tip: false });
         } else { // Choice: Exit
@@ -1350,9 +956,7 @@ bot.dialog('/appeal', [
 	function(session, results){
 		if (results.response){ // Email User Appeal Process Information
 			session.userData.profile.email = results.response;
-        console.log("Email is: " + JSON.stringify(results.response));
-        //TOFIX: on Slack, results.response is "<mailto:kevin.s.xu@gmail.com|kevin.s.xu@gmail.com>"
-        //so current snippet won't work...
+            console.log("Email is: " + JSON.stringify(results.response));
     		var email_addr = results.response;
 
     		session.send("Great! I'll send to " + email_addr + " right now...");
@@ -1365,10 +969,11 @@ bot.dialog('/appeal', [
             })
             var email_body = insurance_module.appealInfo(true);
 
+            // NOTE: change this to your own email:
             var mailOptions = {
-            	from: '"KAI" <ceohockey60@gmail.com>',
+            	from: '"Hilbert" <ceohockey60@gmail.com>',
             	to: email_addr,
-            	subject: 'How to File an Appeal - Sent by KAI',
+            	subject: 'How to File an Appeal - Sent by Hilbert',
             	html: email_body
             };
             transporter.sendMail(mailOptions, function (err, info){
@@ -1384,7 +989,6 @@ bot.dialog('/appeal', [
 	                session.replaceDialog('/appeal', { reprompt: true, name: session.userData.profile.name });
             	}
             });
-
         } else {
 			session.sendTyping();
 			session.send("Ok, sounds good.");
@@ -1393,36 +997,6 @@ bot.dialog('/appeal', [
 	}
 ]);
 bot.beginDialogAction('Appeal', '/appeal');
-
-// -----------------------------------------------
-// TODO: Help Estimate Cost for certain procedure -- Dialog Thread
-// -----------------------------------------------
-bot.dialog('/estimate_cost', [
-	function(session, args, next){
-		//FLOW:
-		  // - Ask for procedure name, combine with state/zipcode
-		  // - send email to admin to do cost estimation manually
-		  // - take average of healthcarebluebook.com + newchoicehealth.com + clearhealthcost.com
-		  // - also look up Medicare rate
-		  // - send fair value average and medicare rate to user (NEED: async or Promise? check npm for tools!)
-		session.send("Stay tuned...I'll be able to help you estimate cost soon!");
-		// REASSESS: if query dialog needs to be reprompted here
-        session.replaceDialog('/home', { reprompt: true, name: session.userData.profile.name });
-	}
-]);
-bot.beginDialogAction('Estimate Cost', '/estimate_cost');
-
-// // -----------------------------------------------
-// // TODO: Drugs Related Questions -- Dialog Thread
-// // -----------------------------------------------
-// bot.dialog('/drugs', [
-// 	function(session, args, next){
-// 		session.send("Druuuuuugggsss....");
-// 		// REASSESS: if query dialog needs to be reprompted here
-//         session.replaceDialog('/home', { reprompt: true, name: session.userData.profile.name });
-// 	}
-// ]);
-// bot.beginDialogAction('Drugs', '/drugs');
 
 
 // -----------------------------------------------
@@ -1442,7 +1016,7 @@ bot.dialog('/exit', [
             session.send("You got it! Deleting now...");
 			session.sendTyping();
 			session.send("Done!");
-		} else { // May want to enter HIPAA compliance language here...
+		} else { 
 			session.send("Ok, we will keep your information safely stored, and we can pick up where we left off the next time we chat!");
 			session.save();
 			session.sendTyping();
