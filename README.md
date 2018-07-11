@@ -1,4 +1,6 @@
 # hilbert-insurance-bot
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fceohockey60%2Fhilbert-insurance-bot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fceohockey60%2Fhilbert-insurance-bot?ref=badge_shield)
+
 I'm a recent law school grad, who took a bunch of CS classes during school and decided to build a chatbot that answers questions 
 and provides information on the health insurance plan I had during school--Stanford Cardinal Care. It's built using Microsoft's 
 Bot Framework and Cognitive Services. This is my first project on GitHub. By making this repo, I hope to show how chatbot and related AI 
@@ -58,3 +60,7 @@ This prototype is by no means complete, so I will continue to work on it and ope
       - Come up with a more robust scheme and structure to model insurance plan terms and conditions
 
 Feel free to reach out if you have questions, issues, or want to collaborate.
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fceohockey60%2Fhilbert-insurance-bot.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fceohockey60%2Fhilbert-insurance-bot?ref=badge_large)
